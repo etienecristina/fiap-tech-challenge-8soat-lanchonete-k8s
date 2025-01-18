@@ -14,7 +14,7 @@ provider "aws" {
 
 # Variáveis
 variable "cluster_name" {
-  default = "simple-eks-cluster"
+  default = "fiap-tech-challenge-8soat-lanchonete-eks"
 }
 
 # VPC
