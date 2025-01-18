@@ -1,0 +1,61 @@
+name: Deploy Kubernetes Infra
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      # Set up Terraform
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.6`1
+
+      # Terraform Init
+      - name: Terraform Init
+        run: |
+          terraform init
+
+      - name: Terraform Format
+        run: |
+          terraform fmt
+
+      # Terraform Plan
+      - name: Terraform Plan
+        run: |
+          terraform plan
+
+      # Terraform Apply
+      - name: Terraform Apply
+        run: |
+          terraform apply -auto-approve
+
+      - name: Update Kube Config
+        run: aws eks update-kubeconfig --name EKS-fiap-tech-challenge --region us-east-1
+
+      - name: Test Kube Config
+        run: |
+          kubectl get nodes
+
+      # Terraform destroy
+      - name: Terraform Destroy
+        if: always()
+        run: |
+          terraform destroy -auto-approve
