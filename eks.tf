@@ -59,7 +59,7 @@ resource "aws_subnet" "private_subnet" {
   map_public_ip_on_launch = false
   availability_zone       = data.aws_availability_zones.available.names[count.index]
   tags = {
-    Name = "eks-private-subnet-${count.index + 1}""arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+    Name = "eks-private-subnet-${count.index + 1}"
   }
 }
 
