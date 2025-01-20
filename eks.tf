@@ -133,7 +133,7 @@ resource "aws_eks_access_policy_association" "eks-policy" {
 resource "aws_eks_node_group" "fiap_node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "${var.cluster_name}-ng"
-  node_role_arn   = aws_iam_role.labrole.arn
+  node_role_arn   = aws_iam_role.eks_role.arn
   subnet_ids      = [for subnet in aws_subnet.private_subnet : subnet.id if subnet.availability_zone != "${var.region}e"]
   disk_size       = 50
   instance_types  = ["t3a.medium"]
