@@ -8,8 +8,13 @@ terraform {
   required_version = ">= 1.3.0"
 }
 
-provider "aws" {
-  region = "us-east-1" # Substitua pela região desejada
+
+variable "region" {
+  default = "us-east-1"
+}
+
+variable "accountIdVoclabs" {
+  default = "327306512886"
 }
 
 # Variáveis
@@ -17,8 +22,8 @@ variable "cluster_name" {
   default = "fiap-tech-challenge-8soat-lanchonete-eks"
 }
 
-variable "accountIdVoclabs" {
-  default = "327306512886"
+provider "aws" {
+  region = "${var.region}" # Substitua pela região desejada
 }
 
 # VPC
