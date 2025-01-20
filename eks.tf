@@ -21,9 +21,19 @@ variable "accountIdVoclabs" {
   default = "327306512886"
 }
 
+# VPC
+resource "aws_vpc" "eks_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = {
+    Name = "eks-vpc"
+  }
+}
+
 resource "aws_security_group" "sg" {
   name   = "${var.cluster_name}-SG"
-  vpc_id = data.aws_vpc.eks_vpc.id
+  vpc_id = aws_vpc.eks_vpc.id
 
   ingress {
     description = "All"
@@ -39,16 +49,6 @@ resource "aws_security_group" "sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-# VPC
-resource "aws_vpc" "eks_vpc" {
-  cidr_block           = "10.0.0.0/16"
-  enable_dns_support   = true
-  enable_dns_hostnames = true
-  tags = {
-    Name = "eks-vpc"
   }
 }
 
