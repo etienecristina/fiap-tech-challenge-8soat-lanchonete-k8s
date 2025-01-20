@@ -55,7 +55,7 @@ jobs:
           kubectl get nodes
 
       # Terraform destroy
-     # - name: Terraform Destroy
-        #if: always()
-        #run: |
-          #terraform destroy -auto-approve
+      - name: Terraform Destroy
+        if: always()
+        run: |
+          terraform destroy -auto-approve
