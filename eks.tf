@@ -23,7 +23,7 @@ variable "accountIdVoclabs" {
 
 resource "aws_security_group" "sg" {
   name   = "${var.cluster_name}-SG"
-  vpc_id = data.aws_vpc.vpc.id
+  vpc_id = data.aws_vpc.eks_vpc.id
 
   ingress {
     description = "All"
