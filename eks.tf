@@ -84,6 +84,8 @@ resource "aws_eks_cluster" "eks_cluster" {
     Name = var.cluster_name
     Institute = "FIAP"
   }
+  
+  identity_providers = ["aes-iam", "config-map"]
 }
 
 # IAM Role for EKS
@@ -97,7 +99,9 @@ resource "aws_iam_role" "eks_role" {
         Action    = "sts:AssumeRole"
         Effect    = "Allow"
         Principal = {
-          Service = "eks.amazonaws.com"
+          Service = ["eks.amazonaws.com",
+          	"ec2.amazonaws.com"
+          ]
         }
       },
     ]
@@ -139,7 +143,7 @@ resource "aws_eks_node_group" "fiap_node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "${var.cluster_name}-ng"
   node_role_arn   = aws_iam_role.eks_role.arn
-  subnet_ids      = [for subnet in aws_subnet.private_subnet : subnet.id if subnet.availability_zone != "${var.region}e"]
+  subnet_ids      = aws_subnet.private_subnet[*].id
   disk_size       = 50
   instance_types  = ["t3a.medium"]
 
