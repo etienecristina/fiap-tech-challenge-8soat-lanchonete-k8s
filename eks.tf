@@ -82,7 +82,7 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   tags = {
     Name = var.cluster_name
-    Institute = "FIAP"
+    Institute = "FIAP" 
   }
 }
 
