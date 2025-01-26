@@ -85,7 +85,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     Institute = "FIAP"
   }
   
-  identity_providers = ["aes-iam", "config-map"]
+  identity_providers = ["aws-iam", "config-map"]
 }
 
 # IAM Role for EKS
