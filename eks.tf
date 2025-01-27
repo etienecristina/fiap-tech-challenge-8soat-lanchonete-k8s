@@ -120,17 +120,17 @@ resource "aws_iam_role_policy_attachment" "vpc_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
 }
 
-resource "aws_eks_access_entry" "access-entry" {
-  cluster_name      = aws_eks_cluster.eks_cluster.name
-  principal_arn     = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
-  kubernetes_groups = ["fiap"]
-  type              = "STANDARD"
-}
+#resource "aws_eks_access_entry" "access-entry" {
+#  cluster_name      = aws_eks_cluster.eks_cluster.name
+#  principal_arn     = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
+#  kubernetes_groups = ["fiap"]
+#  type              = "STANDARD"
+#}
 
-resource "aws_eks_access_policy_association" "eks-policy" {
-  cluster_name  = aws_eks_cluster.eks_cluster.name
-  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-  principal_arn = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
+#resource "aws_eks_access_policy_association" "eks-policy" {
+#  cluster_name  = aws_eks_cluster.eks_cluster.name
+#  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+#  principal_arn = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
 
   access_scope {
     type = "cluster"
