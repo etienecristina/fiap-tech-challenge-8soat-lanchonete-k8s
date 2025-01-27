@@ -132,10 +132,10 @@ resource "aws_iam_role_policy_attachment" "vpc_cni_policy" {
 #  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
 #  principal_arn = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
 
-  access_scope {
-    type = "cluster"
-  }
-}
+  #access_scope {
+   # type = "cluster"
+ # }
+#}
 
 resource "aws_eks_node_group" "fiap_node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
