@@ -8,7 +8,6 @@ terraform {
   required_version = ">= 1.3.0"
 }
 
-
 variable "region" {
   default = "us-east-1"
 }
@@ -23,7 +22,7 @@ variable "cluster_name" {
 }
 
 provider "aws" {
-  region = "${var.region}" # Substitua pela região desejada
+  region = var.region
 }
 
 # VPC
@@ -42,8 +41,8 @@ resource "aws_security_group" "sg" {
 
   ingress {
     description = "All"
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 0
+    to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -74,15 +73,16 @@ data "aws_availability_zones" "available" {}
 resource "aws_eks_cluster" "eks_cluster" {
   name     = var.cluster_name
   role_arn = aws_iam_role.eks_role.arn
+  version  = "1.27"  # Especifique a versão do Kubernetes
 
   vpc_config {
-    subnet_ids = aws_subnet.private_subnet[*].id
+    subnet_ids         = aws_subnet.private_subnet[*].id
     security_group_ids = [aws_security_group.sg.id]
   }
 
   tags = {
-    Name = var.cluster_name
-    Institute = "FIAP" 
+    Name      = var.cluster_name
+    Institute = "FIAP"
   }
 }
 
@@ -97,11 +97,9 @@ resource "aws_iam_role" "eks_role" {
         Action    = "sts:AssumeRole"
         Effect    = "Allow"
         Principal = {
-          Service = ["eks.amazonaws.com",
-          	"ec2.amazonaws.com"
-          ]
+          Service = ["eks.amazonaws.com", "ec2.amazonaws.com"]
         }
-      },
+      }
     ]
   })
 
@@ -120,31 +118,25 @@ resource "aws_iam_role_policy_attachment" "vpc_cni_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
 }
 
-#resource "aws_eks_access_entry" "access-entry" {
-#  cluster_name      = aws_eks_cluster.eks_cluster.name
-#  principal_arn     = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
-#  kubernetes_groups = ["fiap"]
-#  type              = "STANDARD"
-#}
+# Node Group
+data "aws_ssm_parameter" "eks_ami" {
+  name = "/aws/service/eks/optimized-ami/${aws_eks_cluster.eks_cluster.version}/amazon-linux-2/recommended/image_id"
+}
 
-#resource "aws_eks_access_policy_association" "eks-policy" {
-#  cluster_name  = aws_eks_cluster.eks_cluster.name
-#  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-#  principal_arn = "arn:aws:iam::${var.accountIdVoclabs}:role/voclabs"
-
-  #access_scope {
-   # type = "cluster"
- # }
-#}
+resource "aws_launch_template" "eks_node_group" {
+  name_prefix   = "eks-node-group-"
+  image_id      = data.aws_ssm_parameter.eks_ami.value
+  instance_type = "t3a.medium"
+}
 
 resource "aws_eks_node_group" "fiap_node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "${var.cluster_name}-ng"
-  node_role_arn = aws_iam_role.node_group_role.arn
-
+  node_role_arn   = aws_iam_role.node_group_role.arn
   subnet_ids      = aws_subnet.private_subnet[*].id
   disk_size       = 50
   instance_types  = ["t3a.medium"]
+  version         = aws_eks_cluster.eks_cluster.version  # Use a mesma versão do cluster
 
   scaling_config {
     desired_size = 1
@@ -155,8 +147,14 @@ resource "aws_eks_node_group" "fiap_node_group" {
   update_config {
     max_unavailable = 1
   }
+
+  launch_template {
+    id      = aws_launch_template.eks_node_group.id
+    version = aws_launch_template.eks_node_group.latest_version
+  }
 }
 
+# IAM Role for Node Group
 resource "aws_iam_role" "node_group_role" {
   name = "${var.cluster_name}-node-group-role"
 
@@ -164,7 +162,7 @@ resource "aws_iam_role" "node_group_role" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
+        Effect    = "Allow"
         Principal = {
           Service = "ec2.amazonaws.com"
         }
@@ -189,7 +187,6 @@ resource "aws_iam_role_policy_attachment" "eks_ec2_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-
 # Outputs
 output "eks_cluster_endpoint" {
   value = aws_eks_cluster.eks_cluster.endpoint
@@ -198,4 +195,3 @@ output "eks_cluster_endpoint" {
 output "eks_cluster_arn" {
   value = aws_eks_cluster.eks_cluster.arn
 }
-
