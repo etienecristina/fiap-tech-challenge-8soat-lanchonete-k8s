@@ -181,7 +181,7 @@ resource "aws_iam_role_policy_attachment" "eks_worker_node_policy" {
 
 resource "aws_iam_role_policy_attachment" "eks_cni_policy" {
   role       = aws_iam_role.node_group_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSCNIPolicy"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 
 resource "aws_iam_role_policy_attachment" "eks_ec2_policy" {
