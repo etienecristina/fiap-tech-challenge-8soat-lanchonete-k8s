@@ -36,7 +36,7 @@ jobs:
         run: terraform fmt
 
       # Terraform Plan
-      - name: Terraform Plan
+      - name: Terraform Plan	
         run: terraform plan -var="region=${{ secrets.AWS_REGION }}" -var="vpc_id=${{ secrets.VPC_ID }}" -var="subnet_ids=${{ secrets.SUBNET_IDS }}"
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -52,4 +52,16 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     
+       - name: Update Kube Config
+        run: aws eks update-kubeconfig --name fiap-tech-challenge-8soat-lanchonete-eks --region us-east-1
+
+      - name: Test Kube Config
+        run: |
+          kubectl get nodes
+          
+      # Terraform destroy
+      - name: Terraform Destroy
+        if: always()
+        run: |
+          terraform destroy -auto-approve
 
