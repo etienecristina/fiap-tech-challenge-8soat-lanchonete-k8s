@@ -36,7 +36,7 @@ jobs:
 
       # Terraform Plan
       - name: Terraform Plan	
-        run: terraform plan -var="region=${{ secrets.AWS_REGION }}" -var="vpc_id=${{ secrets.VPC_ID }}"
+        run: terraform plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -45,7 +45,7 @@ jobs:
 
       # Terraform Apply
       - name: Terraform Apply
-        run: terraform apply -auto-approve -var="region=${{ secrets.AWS_REGION }}" -var="vpc_id=${{ secrets.VPC_ID }}" -var="subnet_ids=[${{ secrets.SUBNET_IDS }}]"
+        run: terraform apply -auto-approve
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
