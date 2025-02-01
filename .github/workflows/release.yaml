@@ -51,7 +51,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
     
-       - name: Update Kube Config
+      - name: Update Kube Config
         run: aws eks update-kubeconfig --name fiap-tech-challenge-8soat-lanchonete-eks --region us-east-1
 
       - name: Test Kube Config
